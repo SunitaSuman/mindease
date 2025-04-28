@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                Welcome Back, {{ user.first_name|default:user.username }} ✨
+            </h2>
+            <p class="mt-3 text-lg text-gray-600">Your daily wellness journey awaits</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Mood Section -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white">Current Mood</h3>
+                </div>
+                <div class="p-6">
+                    {% if latest_mood %}
+                        <div class="flex items-center space-x-3">
+                            <span class="text-3xl">{{ latest_mood.get_mood_display }}</span>
+                            <div>
+                                <p class="text-gray-600">{{ latest_mood.note }}</p>
+                                <p class="text-sm text-gray-400 mt-1">{{ latest_mood.timestamp|date:"M d, H:i" }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500">No mood logged yet today</p>
+                    {% endif %}
+                    <a href="{% url 'mood_tracker' %}" class="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-700">
+                        Update mood
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Daily Tasks -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div class="bg-gradient-to-r from-green-500 to-teal-600 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white">Daily Tasks</h3>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-2xl font-bold text-teal-600">{{ completion_percentage }}%</div>
+                        <div class="text-sm text-gray-500">Tasks Completed</div>
+                    </div>
+                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-teal-500 transition-all duration-500" style="width: {{ completion_percentage }}%"></div>
+                    </div>
+                    <a href="{% url 'daily_tasks' %}" class="mt-4 inline-flex items-center text-teal-600 hover:text-teal-700">
+                        View tasks
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Journal -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div class="bg-gradient-to-r from-pink-500 to-rose-600 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white">Journal</h3>
+                </div>
+                <div class="p-6">
+                    {% if latest_journal %}
+                        <p class="text-gray-600 italic">"{{ latest_journal.entry|truncatechars:100 }}"</p>
+                        <p class="text-sm text-gray-400 mt-2">{{ latest_journal.created_at|date:"M d, Y" }}</p>
+                    {% else %}
+                        <p class="text-gray-500">Start your journaling journey today</p>
+                    {% endif %}
+                    <a href="{% url 'journal' %}" class="mt-4 inline-flex items-center text-pink-600 hover:text-pink-700">
+                        Write entry
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AI Chatbot -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div class="bg-gradient-to-r from-yellow-500 to-orange-600 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white">AI Companion</h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600">Need someone to talk to? Your AI companion is here to listen and support you.</p>
+                    <a href="{% url 'ai_chatbot' %}" class="mt-4 inline-flex items-center text-yellow-600 hover:text-yellow-700">
+                        Start chatting
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div class="bg-gradient-to-r from-purple-500 to-yellow-100 px-6 py-4">
+                  <h3 class="text-xl font-semibold text-white">To-Do</h3>
+              </div>
+              <div class="p-6">
+                  <p class="text-gray-600">keep track of your personal daily goals</p>
+                  <a href="{% url 'todo_list' %}" class="mt-4 inline-flex items-center text-purple-600 hover:text-yellow-300">
+                      Start do-toing
+                      <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                  </a>
+              </div>
+          </div>
+
+
+          <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <div class="bg-gradient-to-r from-yellow-500 to-purple-300 px-6 py-4">
+                <h3 class="text-xl font-semibold text-white">Resources</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600">Some extra help for you</p>
+                <a href="{% url 'resource' %}" class="mt-4 inline-flex items-center text-purple-600 hover:text-yellow-300">
+                    Help
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+
+
+
+
+            <!-- Wellness Tracking -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div class="bg-gradient-to-r from-purple-500 to-violet-600 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white">Wellness Tracking</h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600">Track your daily wellness metrics and see your progress over time.</p>
+                    <a href="{% url 'wellness_tracking' %}" class="mt-4 inline-flex items-center text-purple-600 hover:text-purple-700">
+                        Log activities
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

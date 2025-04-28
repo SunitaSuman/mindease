@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Journal{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 py-12 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">
+                Daily Journal ✍️
+            </h2>
+            <p class="mt-2 text-gray-600">Express yourself freely and reflect on your journey</p>
+        </div>
+
+        <!-- Journal Form -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-10">
+            <div class="bg-gradient-to-r from-teal-500 to-emerald-600 px-6 py-4">
+                <h3 class="text-xl font-semibold text-white">New Entry</h3>
+            </div>
+            <div class="p-6">
+                <form id="journal-form" method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                        <input 
+                            type="text" 
+                            name="title" 
+                            id="title"
+                            placeholder="Give your entry a title..."
+                            value="Journal Entry - {{ today|date:'Y-m-d' }}"
+                            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200 focus:ring-opacity-50"
+                        >
+                    </div>
+                    <div>
+                        <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+                        <input 
+                            type="text" 
+                            name="tags" 
+                            id="tags"
+                            placeholder="gratitude, reflection, goals..."
+                            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200 focus:ring-opacity-50"
+                        >
+                    </div>
+                    <div>
+                        <label for="entry" class="block text-sm font-medium text-gray-700">Your Thoughts</label>
+                        <textarea
+                            name="entry"
+                            id="entry"
+                            rows="6"
+                            placeholder="What's on your mind today?"
+                            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200 focus:ring-opacity-50"
+                        ></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50">
+                            Save Entry ✨
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Past Entries -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-teal-500 to-emerald-600 px-6 py-4">
+                <h3 class="text-xl font-semibold text-white">Previous Entries</h3>
+            </div>
+            <div class="p-6">
+                {% if all_entries %}
+                    <div class="space-y-6">
+                        {% for entry in all_entries %}
+                            <div class="bg-teal-50 rounded-xl p-6 hover:shadow-md transition-shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-teal-800">{{ entry.title }}</h4>
+                                        <p class="text-sm text-gray-500">{{ entry.created_at|date:"M d, Y - H:i" }}</p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <a href="{% url 'edit_journal_entry' entry.id %}" class="text-teal-600 hover:text-teal-700">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </a>
+                                        <form method="post" action="{% url 'delete_journal_entry' entry.id %}" class="inline">
+                                            {% csrf_token %}
+                                            <button type="submit" onclick="return confirm('Are you sure?')" class="text-red-600 hover:text-red-700">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <p class="mt-3 text-gray-700">{{ entry.entry|truncatechars:200 }}</p>
+                                {% if entry.tags %}
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        {% for tag in entry.tags.split %}
+                                            <span class="px-2 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">
+                                                #{{ tag }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">Start your journaling journey today! ✨</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-8">
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center text-teal-600 hover:text-teal-700">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("journal-form").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+    
+        try {
+            const response = await fetch("", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                form.reset();
+                location.reload();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+</script>
+{% endblock %}

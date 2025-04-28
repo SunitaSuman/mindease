@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}To-Do List{% endblock %}
+{% block content %}
+<div class="p-6 max-w-xl mx-auto text-gray-800">
+  <h2 class="text-3xl font-bold mb-6 text-blue-700">📝 Your To-Do List</h2>
+
+  <!-- Add Task Form -->
+  <form method="post" action="{% url 'add_todo' %}" class="mb-6 bg-gray-50 p-4 rounded-lg shadow-md">
+    {% csrf_token %}
+    <input
+      type="text"
+      name="title"
+      placeholder="Enter a new task..."
+      required
+      class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 mb-3"
+    />
+    <button
+      type="submit"
+      class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+    >
+      ➕ Add Task
+    </button>
+  </form>
+
+  <!-- Task List -->
+  <ul class="space-y-4">
+    {% for todo in todos %}
+      <li class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex justify-between items-center">
+        <div class="flex flex-col">
+          <span class="text-lg font-medium">{{ todo.title }}</span>
+          {% if todo.completed %}
+            <span class="text-sm text-green-600">✅ Completed</span>
+          {% else %}
+            <span class="text-sm text-orange-500">⏳ Pending</span>
+          {% endif %}
+        </div>
+        <div class="flex space-x-3">
+          <!-- Toggle completion -->
+          <form method="post" action="{% url 'toggle_todo' todo.id %}" class="inline">
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+            >
+              Toggle
+            </button>
+          </form>
+
+          <!-- Delete -->
+          <form method="post" action="{% url 'delete_todo' todo.id %}" class="inline">
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+            >
+              Delete
+            </button>
+          </form>
+        </div>
+      </li>
+    {% empty %}
+      <p class="text-center text-gray-500 mt-4">You don't have any tasks yet. Start by adding one above!</p>
+    {% endfor %}
+  </ul>
+
+  <div style="text-align: center;">
+    <a href="{% url 'dashboard' %}" class="back-btn">
+        ⬅️ Back to Dashboard
+    </a>
+</div>
+</div>
+{% endblock %}

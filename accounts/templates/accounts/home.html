@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+{% block content %}
+  <div class="text-center mt-10">
+    <h1 class="text-3xl font-bold text-purple-700">Hey love, welcome to your safe space 🫶</h1>
+    <p class="mt-4 text-xl text-gray-600">Let’s take care of your mind and soul today 💫</p>
+    <a href="{% url 'dashboard' %}" class="mt-8 inline-block bg-purple-600 text-white px-6 py-3 rounded-3xl shadow-lg transition duration-300 hover:bg-purple-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400">
+      Go to Dashboard
+    </a>
+  </div>
+{% endblock %}

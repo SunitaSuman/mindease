@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-6">
+    <h2 class="text-3xl font-bold text-center text-pink-600 mb-8">Wellness Tracker</h2>
+
+    <!-- Form -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+        <h3 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Log Your Wellness</h3>
+        <form id="wellnessForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Sleep Duration (hours)</label>
+                <input type="number" step="0.1" min="0" name="sleep_duration" required class="mt-1 p-2 w-full border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Screen Time (hours)</label>
+                <input type="number" step="0.1" min="0" name="screen_time" required class="mt-1 p-2 w-full border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Outdoor Time (hours)</label>
+                <input type="number" step="0.1" min="0" name="outdoor_time" required class="mt-1 p-2 w-full border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Exercise Time (minutes)</label>
+                <input type="number" step="1" min="0" name="exercise_time" required class="mt-1 p-2 w-full border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <button type="submit" class="mt-6 bg-pink-500 hover:bg-pink-600 text-white py-2 px-6 rounded-lg w-full">Submit</button>
+        </form>
+    </div>
+
+    <!-- Chart -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+        <h3 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Your Wellness Over Last 7 Entries</h3>
+        <canvas id="wellnessChart"></canvas>
+    </div>
+
+    <!-- Recommendations -->
+    <div id="recommendationsSection" class="bg-pink-100 dark:bg-pink-900 p-6 rounded-lg shadow-md {% if not recommendations %}hidden{% endif %}">
+        <h3 class="text-xl font-bold text-pink-800 dark:text-pink-200 mb-2">Recommendations for You:</h3>
+        <ul id="recommendationsList" class="list-disc list-inside text-gray-700 dark:text-gray-200">
+            {% for rec in recommendations %}
+                <li>{{ rec }}</li>
+            {% endfor %}
+        </ul>
+        <p id="complimentText" class="mt-4 text-green-700 dark:text-green-300 font-semibold {% if not compliment %}hidden{% endif %}">
+            🌟 You're maintaining a great balance! Keep it up!
+        </p>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript for form and chart -->
+<script>
+let wellnessChart;
+
+function updateChart(logs) {
+    const dates = logs.map(log => log.date);
+    const sleepDurations = logs.map(log => log.sleep_duration);
+    const screenTimes = logs.map(log => log.screen_time);
+    const outdoorTimes = logs.map(log => log.outdoor_time);
+    const exerciseTimes = logs.map(log => log.exercise_time);
+
+    if (wellnessChart) {
+        wellnessChart.destroy();
+    }
+
+    const ctx = document.getElementById('wellnessChart').getContext('2d');
+    wellnessChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                { label: 'Sleep (hrs)', data: sleepDurations, borderColor: '#F472B6', fill: false },
+                { label: 'Screen Time (hrs)', data: screenTimes, borderColor: '#60A5FA', fill: false },
+                { label: 'Outdoor Time (hrs)', data: outdoorTimes, borderColor: '#34D399', fill: false },
+                { label: 'Exercise (min)', data: exerciseTimes, borderColor: '#FBBF24', fill: false },
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+function updateRecommendations(recommendations, compliment) {
+    const recommendationsSection = document.getElementById('recommendationsSection');
+    const recommendationsList = document.getElementById('recommendationsList');
+    const complimentText = document.getElementById('complimentText');
+
+    recommendationsList.innerHTML = recommendations.map(rec => `<li>${rec}</li>`).join('');
+    
+    if (recommendations.length > 0) {
+        recommendationsSection.classList.remove('hidden');
+    } else {
+        recommendationsSection.classList.add('hidden');
+    }
+
+    if (compliment) {
+        complimentText.classList.remove('hidden');
+    } else {
+        complimentText.classList.add('hidden');
+    }
+}
+
+// Initialize chart with existing data
+updateChart({{ logs|safe }});
+
+// Form Submission
+document.getElementById('wellnessForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+        sleep_duration: parseFloat(form.sleep_duration.value),
+        screen_time: parseFloat(form.screen_time.value),
+        outdoor_time: parseFloat(form.outdoor_time.value),
+        exercise_time: parseFloat(form.exercise_time.value)
+    };
+
+    try {
+        const response = await fetch("{% url 'wellness_tracking' %}", {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            // Update the chart with new data
+            updateChart(result.logs);
+            // Update recommendations
+            updateRecommendations(result.recommendations, result.compliment);
+            // Clear the form
+            form.reset();
+        } else {
+            alert("Error submitting data: " + result.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert("An error occurred while submitting the data");
+    }
+});
+</script>
+{% endblock %}
