@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-t@ui&kt(nn5&@8^qw@^(*3fg7rokw84#jdor%0y&$kynp&t)&j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mentalhealth_app.onrender.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # Replace with your domain or IP address
 
 
 # Application definition
@@ -163,3 +163,6 @@ from decouple import config
 
 OPENAI_API_KEY = config('OPENAI_API_KEY')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+from dotenv import load_dotenv
+load_dotenv()
