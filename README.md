@@ -52,38 +52,30 @@ git clone https://github.com/username/mindbloom.git
 cd mindbloom
 Create and activate a virtual environment:
 
-bash
-Copy
-Edit
+
 python -m venv env
 source env/bin/activate  # On Windows use: env\Scripts\activate
 Install dependencies:
 
-bash
-Copy
-Edit
+
 pip install -r requirements.txt
 Set up the database:
 
-bash
-Copy
-Edit
+
 python manage.py migrate
 Create a superuser for admin access:
 
-bash
-Copy
-Edit
+
 python manage.py createsuperuser
 Run the development server:
 
-bash
-Copy
-Edit
+
 python manage.py runserver
 Visit the application:
 
 Open your browser and go to: http://127.0.0.1:8000/
+
+```
 
 Future Scope
 Launch a mobile app for Android and iOS.
