@@ -27,13 +27,6 @@ MindEase is an AI-integrated mental wellness web application designed to help us
 - **AI Integration**: Randomized wellness suggestion logic
 - **Deployment**: Local or Cloud platforms like AWS, Heroku, Render
 
-## Project Structure
-
-mindbloom/ ├── mindbloom/ # Django project settings ├── accounts/ # User authentication app ├── tracker/ # Mood tracking, journaling, tasks app ├── templates/ # HTML templates ├── static/ # Static files (CSS, JS, Images) ├── media/ # Uploaded files (profile images, etc.) ├── manage.py # Django management script └── requirements.txt # Project dependencies
-
-markdown
-Copy
-Edit
 
 ## Installation
 
