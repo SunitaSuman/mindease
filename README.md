@@ -102,6 +102,13 @@ Contributing: Feel free to fork the repository, make your changes, and create a 
 
 Let me know if you need any adjustments or additional details!
 
+For queries, feedback, or collaboration opportunities:
+
+Name: Sunita Kumari
+Email: summu.sunita345@gmail.com
+LinkedIn: https://www.linkedin.com/in/sunita-kumari-b6b296235
+
+
 
 
 
