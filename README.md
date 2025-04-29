@@ -75,34 +75,27 @@ Installation:
 
 Clone the repository:
 
-bash
-Copy
-Edit
+
 git clone https://github.com/username/mindbloom.git
 Install dependencies:
 
-nginx
-Copy
-Edit
-pip install -r requirements.txt
+`pip install -r requirements.txt`
+
+
 Set up the database:
 
-nginx
-Copy
-Edit
-python manage.py migrate
+`python manage.py migrate`
+
+
 Create a superuser to access the admin panel:
 
-nginx
-Copy
-Edit
-python manage.py createsuperuser
+`python manage.py createsuperuser`
+
+
 Run the development server:
 
-nginx
-Copy
-Edit
-python manage.py runserver
+`python manage.py runserver`
+
 Access the app at http://127.0.0.1:8000/
 
 Contributing: Feel free to fork the repository, make your changes, and create a pull request. Contributions are always welcome!
